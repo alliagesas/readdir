@@ -12,7 +12,7 @@ def _listdir(tree, path, pattern, recurse):
     if path != "":
         full_path += r"\%s" % path
     #print(tree.share_name)
-    print('Parcours de ' + full_path)
+
     # We create a compound request that does the following;
     #     1. Opens a handle to the directory
     #     2. Runs a query on the directory to list all the files
@@ -61,6 +61,8 @@ def _listdir(tree, path, pattern, recurse):
         #print(fe.path)
 
         if fe.is_directory:
+            print('Traitement de ' + full_path)
+
             if fe.acl.heritage() == False:
                 output.write('HERITAGE DESACTIVE => ' + fe.path)
                 output.write(fe.acl)
