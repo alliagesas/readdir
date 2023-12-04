@@ -64,12 +64,12 @@ def _listdir(tree, path, pattern, recurse):
             print('Traitement de ' + fe.path)
 
             if fe.acl.heritage() == False:
-                output.write('HERITAGE DESACTIVE => ' + fe.path)
-                output.write(str(fe.acl))
+                output.write('\nHERITAGE DESACTIVE => ' + fe.path)
+                output.write('\n' + str(fe.acl))
 
             elif fe.acl.specifiques() == True:
-                output.write('DROITS SPECIFIQUES => ' + fe.path)
-                output.write(str(fe.acl))
+                output.write('\nDROITS SPECIFIQUES => ' + fe.path)
+                output.write('\n' + str(fe.acl))
 
         if fe.is_directory and recurse:
             #entries.append(fe)
