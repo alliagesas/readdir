@@ -61,7 +61,7 @@ def _listdir(tree, path, pattern, recurse):
         #print(fe.path)
 
         if fe.is_directory:
-            print('Traitement de ' + full_path)
+            print('Traitement de ' + fe.path)
 
             if fe.acl.heritage() == False:
                 output.write('HERITAGE DESACTIVE => ' + fe.path)
