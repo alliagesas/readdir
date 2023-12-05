@@ -11,14 +11,15 @@ from .ace import ACE
 
 class ACL:
     def __init__(self, path):
+        self.path = path
         # Liste des droits
         self.aces = []
         # Créateur et groupe
-        self.owner = self.group = self.control = None
+        self.command = self.owner = self.group = self.control = None
         #print(path)
         # Lecture des ACLs
-        acls = self._read_acl(path)
-        for acl in acls:
+        self.acls = self._read_acl(self.path)
+        for acl in self.acls:
             acl_split = acl.split(':')
             if acl_split[0] == 'OWNER':
                 # OWNER
@@ -40,8 +41,12 @@ class ACL:
 
     # True si l'héritage des droits est activé
     def heritage(self):
-        #print(self.control)
-        return not('PD' in self.control)
+        # print(self.control)
+        if self.control != None:
+            return not('PD' in self.control)
+        else:
+            print('Erreur de détection de la chaine CONTROLE pour le dossier ' + self.path + "\nACL lues: " + "\n".join(self.acls) + "Command + " + self.command)
+            return False
 
     # True si des droits spécifiques sont appliqués sur le fichier/dossier
     def specifiques(self):
@@ -51,13 +56,17 @@ class ACL:
         return False
 
     def __str__(self):
-        string = 'CONTROL = ' + '|'.join(self.control)
-        for ace in self.aces:
-            string += "\n" + 'ACL = ' + str(ace)
+        string = ''
+        if self.control != None:
+            string = 'CONTROL = ' + '|'.join(self.control)
+        if self.aces != None:
+            for ace in self.aces:
+                string += "\n" + 'ACL = ' + str(ace)
         return string
 
 
     def _read_acl(self, path):
+        from subprocess import run
         from readdir import args
         path = path.replace('\\', '/')
         path_split = [e for e in path.split('/') if e]
@@ -73,6 +82,14 @@ class ACL:
                 user += args.username
             if len(args.password) > 0:
                 user += '%' + args.password
-        command = "smbcacls \"//%s/%s\" \"/%s\" %s" % (server, share, share_path, user)
+        self.command = "smbcacls \"//%s/%s\" \"/%s\" %s" % (server, share, share_path, user)
+        response = run([self.command], capture_output=True, shell=True)
+        #p = Popen(self.command, stdout=PIPE, stderr=PIPE, shell=True)
+        #stdout, stderr = p.communicate()
+        if len(response.stderr) > 0:
+           print('Erreur lors de la commande : ' + self.command + "\n" + response.stderr.decode("utf-8"))
+        #print(self.command)
+        return response.stdout.decode("utf-8").split('\n')
+        # result = os.popen(self.command)
         #print(command)
-        return os.popen(command).read().split('\n') or exit('Unable to exec ' + command)
+        #return os.popen(self.command).read().split('\n') or print('Unable to exec ' + command)

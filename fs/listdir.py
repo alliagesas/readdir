@@ -1,4 +1,5 @@
 import uuid
+from smbprotocol.exceptions import SMBResponseException
 from smbprotocol.connection import Connection
 from smbprotocol.session import Session
 from smbprotocol.open import CreateDisposition, CreateOptions, DirectoryAccessMask, FileAttributes, \
@@ -45,8 +46,12 @@ def _listdir(tree, path, pattern, recurse):
     )
 
     # Process the result of the create and close request before parsing the files.
-    query[0][1](query_reqs[0])
-    query[2][1](query_reqs[2])
+    try:
+        query[0][1](query_reqs[0])
+        query[2][1](query_reqs[2])
+    except Exception as erreur:
+        print('Impossible de lire de dossier ' + path + '\n' + str(erreur))
+        return
 
     # Parse the queried files and repeat if the entry is a directory and recurse=True. We ignore . and .. as they are
     # not directories inside the queried dir.
