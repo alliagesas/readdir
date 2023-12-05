@@ -56,7 +56,7 @@ def _listdir(tree, path, pattern, recurse):
     # Parse the queried files and repeat if the entry is a directory and recurse=True. We ignore . and .. as they are
     # not directories inside the queried dir.
     # entries = []
-    ignore_entries = [".".encode('utf-16-le'), "..".encode('utf-16-le')]
+    ignore_entries = [".".encode('utf-16-le'), "..".encode('utf-16-le'), '.recycle'.encode('utf-16-le')]
     for file_entry in query[1][1](query_reqs[1]):
         if file_entry['file_name'].value in ignore_entries:
             continue
